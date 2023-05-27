@@ -27,3 +27,10 @@ class CriptoListLoadingFailure extends CriptoListState {
   @override
   List<Object?> get props => [error];
 }
+class DisconnectInternet extends CriptoListState {
+  final Object error;
+  DisconnectInternet({required this.error});
+
+  @override
+  List<Object?> get props => [error];
+}

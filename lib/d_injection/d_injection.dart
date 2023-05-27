@@ -46,9 +46,9 @@ Future<void> initDependencies() async {
   await Hive.initFlutter();
   Hive.registerAdapter(CryptoCoinModelAdapter());
   Hive.registerAdapter(CryptoCoinDetailModelAdapter());
-  const cryptoCoinsBoxName = 'crypto_coins_box';
+  const boxName = 'crypto_coins_box';
   final cryptoCoinsBox =
-      await Hive.openBox<CryptoCoinModel>(cryptoCoinsBoxName);
+      await Hive.openBox<CryptoCoinModel>(boxName);
 
   FlutterError.onError =
       (details) => GetIt.I<Talker>().handle(details.exception, details.stack);
@@ -58,9 +58,9 @@ Future<void> initDependencies() async {
         cryptoCoinsBox: cryptoCoinsBox,
       ));
 
-    final projectID = await Firebase.initializeApp(
+    await Firebase.initializeApp(
    options: DefaultFirebaseOptions.currentPlatform,
    );
 
-    talker.info(projectID.options.projectId);
+
 }

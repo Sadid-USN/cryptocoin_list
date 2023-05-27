@@ -12,24 +12,36 @@ class CriptoRepoImpl implements AbstractCriptoRepository {
   CriptoRepoImpl({required this.dio, required this.cryptoCoinsBox});
   @override
   Future<List<CryptoCoinModel>> getCoinList() async {
+    var cryptoCoinsList = <CryptoCoinModel>[];
     try {
-      final response = await dio.get(
-          "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH,BNB,AAC,ADB,AMLT,ALX,APIS,AXPR&tsyms=USD");
+      cryptoCoinsList = await _fetchCoinsList();
 
-      final data = response.data as Map<String, dynamic>;
-      final dataRaw = data['RAW'] as Map<String, dynamic>;
-      final cryptoCoinsList = dataRaw.entries.map((e) {
-        final usdData =
-            (e.value as Map<String, dynamic>)['USD'] as Map<String, dynamic>;
-        final details = CryptoCoinDetailModel.fromJson(usdData);
-        return CryptoCoinModel(name: e.key, coinDetails: details);
-      }).toList();
-      return cryptoCoinsList;
+      final cyptocoinMap = {for (var e in cryptoCoinsList) e.name: e};
+      await cryptoCoinsBox.putAll(cyptocoinMap);
     } catch (error, stack) {
       GetIt.instance<Talker>().handle(error, stack);
-
-      return [];
+      cryptoCoinsList = cryptoCoinsBox.values.toList();
     }
+
+    // Сортировка  крипы по убыванию по ценам, что бы списки из кэша вернули тот же порядок, что и в API
+    cryptoCoinsList.sort(
+        (a, b) => b.coinDetails.priceInUSD.compareTo(a.coinDetails.priceInUSD));
+    return cryptoCoinsList;
+  }
+
+  Future<List<CryptoCoinModel>> _fetchCoinsList() async {
+    final response = await dio.get(
+        "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH,BNB,AAC,ADB,AMLT,ALX,APIS,AXPR&tsyms=USD");
+
+    final data = response.data as Map<String, dynamic>;
+    final dataRaw = data['RAW'] as Map<String, dynamic>;
+    final cryptoCoinsList = dataRaw.entries.map((e) {
+      final usdData =
+          (e.value as Map<String, dynamic>)['USD'] as Map<String, dynamic>;
+      final details = CryptoCoinDetailModel.fromJson(usdData);
+      return CryptoCoinModel(name: e.key, coinDetails: details);
+    }).toList();
+    return cryptoCoinsList;
   }
 
   @override
@@ -37,10 +49,10 @@ class CriptoRepoImpl implements AbstractCriptoRepository {
     try {
       final coin = await _fetchCoinDetailsFromApi(currencyCode);
       cryptoCoinsBox.put(currencyCode, coin);
-
       return coin;
     } catch (e, st) {
       GetIt.instance<Talker>().handle(e, st);
+
       return cryptoCoinsBox.get(currencyCode)!;
     }
   }

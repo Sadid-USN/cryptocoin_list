@@ -17,7 +17,7 @@ const mycolor = MaterialColor(
 );
 
 final darkTheme = ThemeData(
-  
+  useMaterial3: true,
   scaffoldBackgroundColor: const Color.fromARGB(255, 2, 93, 87),
   primarySwatch: mycolor,
   dividerColor: Colors.grey,
