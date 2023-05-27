@@ -1,5 +1,8 @@
+import 'package:cryptocoin_list/firebase_options.dart';
 import 'package:cryptocoin_list/repositories/abbstract_repository.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -54,4 +57,10 @@ Future<void> initDependencies() async {
         dio: dio,
         cryptoCoinsBox: cryptoCoinsBox,
       ));
+
+    final projectID = await Firebase.initializeApp(
+   options: DefaultFirebaseOptions.currentPlatform,
+   );
+
+    talker.info(projectID.options.projectId);
 }

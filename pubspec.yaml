@@ -42,6 +42,7 @@ dependencies:
   json_annotation: ^4.8.0
   hive_flutter: ^1.1.0
   auto_route: ^6.1.0
+  firebase_core: ^2.13.0
 
   cupertino_icons: ^1.0.2
 
